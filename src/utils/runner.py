@@ -46,6 +46,7 @@ class Collector:
 		if stType:filepath=filepath.replace(_D,'')
 		meta={_G:_Q if caseType else _J}
 		if caseType:meta[_A]=[]
+		cls_ddt = 'cls_ddt_cases' in module.__dict__.keys()
 		for (name,item) in module.__dict__.items():
 			if isinstance(item,list):
 				if name in cls.SUITE_TAGS:
@@ -53,12 +54,42 @@ class Collector:
 					meta[name]=item;cls.suite_tag_table[name][filepath]=item
 			elif isinstance(item,types.FunctionType):
 				if name in cls.SUITE_STS:meta[name]=item
-			elif caseType and isinstance(item,type):
-				if not hasattr(item,'teststeps'):signal.debug(f"no teststeps in class {name}, skip it.");continue
-				if hasattr(item,_K):meta[_A].append(item())
-				elif hasattr(item,'ddt_cases'):
-					for caseData in item.ddt_cases:case=item();case.name,case.para=caseData[_K],caseData['para'];meta[_A].append(case)
-				else:item.name=name;meta[_A].append(item())
+			for (name, item) in module.__dict__.items():
+				if isinstance(item, list):
+					if name in cls.SUITE_TAGS:
+						if not item: continue
+						meta[name] = item;
+						cls.suite_tag_table[name][filepath] = item
+				elif isinstance(item, types.FunctionType):
+					if name in cls.SUITE_STS: meta[name] = item
+				elif caseType and isinstance(item, type):
+					if not hasattr(item, 'teststeps'): signal.debug(f"no teststeps in class {name}, skip it.");continue
+					if not cls_ddt:
+						if hasattr(item, _K) and not hasattr(item, 'ddt_cases'):
+							meta[_A].append(item())
+						elif hasattr(item, 'ddt_cases'):
+							for caseData in item.ddt_cases:
+								case = item();
+								case.name, case.para = caseData[_K], caseData['para'];
+								meta[_A].append(case)
+						else:
+							item.name = name;
+							meta[_A].append(item())
+					else:
+						cls_ddt_cases = module.__dict__['cls_ddt_cases']
+						for cls_data in cls_ddt_cases:
+							case = item()
+							case.cls_para = cls_data['cls_para']
+							if hasattr(item, _K) and not hasattr(item, 'ddt_cases'):
+								case.name = f"{cls_data['cls_name']}-{case.name}"
+								meta[_A].append(case)
+							elif hasattr(item, 'ddt_cases'):
+								for caseData in item.ddt_cases:
+									case.name, case.para = f"{cls_data['cls_name']}-{caseData[_K]}", caseData['para'];
+									meta[_A].append(case)
+							else:
+								case.name = f"{cls_data['cls_name']}-{name}"
+								meta[_A].append(case)
 		new_suite_tag_table={}
 		for (tname,table) in cls.suite_tag_table.items():new_suite_tag_table[tname]={p:v for(p,v)in table.items()if filepath.startswith(p)}
 		cls.suite_tag_table=new_suite_tag_table
