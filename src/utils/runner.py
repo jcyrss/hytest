@@ -78,16 +78,22 @@ class Collector:
 					else:
 						cls_ddt_cases = module.__dict__['cls_ddt_cases']
 						for cls_data in cls_ddt_cases:
-							case = item()
-							case.cls_para = cls_data['cls_para']
 							if hasattr(item, _K) and not hasattr(item, 'ddt_cases'):
+								case = item()
+								case.cls_para = cls_data['cls_para']
 								case.name = f"{cls_data['cls_name']}-{case.name}"
 								meta[_A].append(case)
 							elif hasattr(item, 'ddt_cases'):
 								for caseData in item.ddt_cases:
+									case = item()
+									case.cls_para = cls_data['cls_para']
 									case.name, case.para = f"{cls_data['cls_name']}-{caseData[_K]}", caseData['para'];
 									meta[_A].append(case)
+									if '032' in caseData[_K] or '033' in caseData[_K]:
+										print(case)
 							else:
+								case = item()
+								case.cls_para = cls_data['cls_para']
 								case.name = f"{cls_data['cls_name']}-{name}"
 								meta[_A].append(case)
 		new_suite_tag_table={}
