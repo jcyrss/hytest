@@ -49,9 +49,9 @@ def run():
     event = threading.Event()
     if args.watch:
         watch_list = register_watch('watch', args.watch)
-        event.set()
         for item in watch_list:
             t = threading.Thread(target=item, args=(event,))
+            t.setDaemon(True)
             t.start()
     else:
         watch_list = None
@@ -116,11 +116,22 @@ def run():
         tag_exclude_expr=tag_exclude_expr,
     )
 
-    # 0 表示执行成功 , 1 表示有错误 ， 2 表示没有可以执行的用例
-    result = Runner.run()
+    # 0 表示执行成功 , 1 表示有错误 ， 2 表示没有可以执行的用例,3 表示网页或APP崩溃恢复原状失败
+    result = []  # 懒得重写thread 就传list拿结果
+    t = threading.Thread(target=Runner.run, args=(result, event))
+    t.setDaemon(True)
+    t.start()
+    try:
+        while t.is_alive():
+            pass
+    except:
+        print('Stopped by keyboard')
+
     if watch_list:
         event.clear()
-    return result
+    if not result:
+        return 0
+    return result[0]
 
 
 if __name__ == '__main__':

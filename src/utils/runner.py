@@ -15,8 +15,11 @@ _D = '__st__.py'
 _C = False
 _B = True
 _A = 'cases'
-import os, types, importlib.util, fnmatch, traceback
+already_setup = {}
+
+import os,types,importlib.util,fnmatch,traceback
 from .signal import signal
+from logzero import logger
 
 
 def tagmatch(pattern):
@@ -157,19 +160,28 @@ class Collector:
 
 class Runner:
     @classmethod
-    def run(cls):
-        if not Collector.exec_list: signal.criticalInfo('没有可以执行的测试用例');return 2
+    def run(cls,result,event):
+        if not Collector.exec_list:
+            signal.criticalInfo('没有可以执行的测试用例')
+            result.append(2)
+            return
+        # return 2
         cls.caseId = 0
         for (name, meta) in Collector.exec_table.items():
             if meta[_G] == _J and _E in meta: cls._insertTeardownToExecList(name)
         signal.testStart()
-        cls.execTest()
-        signal.testEnd()
+        code = cls.execTest(event)
+        if code:
+            result.append(code)
+            signal.criticalInfo('恢复原状失败')
+            return
+        signal.test_end(cls)
         from hytest.common import GSTORE
-        return GSTORE['---ret---']
+        result.append(GSTORE.get('---ret---', 3))
+        return
 
     @classmethod
-    def execTest(cls):
+    def execTest(cls,event):
         A = 'suite';
         suite_setup_failed_list = []
         for name in Collector.exec_list:
@@ -196,6 +208,10 @@ class Runner:
                             suite_setup()
                         except Exception as e:
                             signal.setup_fail(name, A, e, traceback.format_exc());suite_setup_failed_list.append(name)
+                        else:
+                            if not already_setup.__contains__(name):
+                                already_setup[name] = suite_setup
+
                 elif meta[_G] == _Q:
                     signal.enter_suite(name, 'file');
                     suite_setup = meta.get(_I)
@@ -205,7 +221,11 @@ class Runner:
                             suite_setup()
                         except Exception as e:
                             signal.setup_fail(name, A, e, traceback.format_exc());continue
-                    cls._exec_cases(meta);
+                    # 开启监控
+                    event.set()
+                    code = cls._exec_cases(meta, event);
+                    if code:
+                        return code
                     suite_teardown = meta.get(_E)
                     if suite_teardown:
                         signal.teardown(name, A)
@@ -213,6 +233,8 @@ class Runner:
                             suite_teardown()
                         except Exception as e:
                             signal.teardown_fail(name, A, e, traceback.format_exc())
+                        finally:
+                            already_setup.pop(name)
 
     @classmethod
     def _insertTeardownToExecList(cls, stName):
@@ -233,15 +255,25 @@ class Runner:
             Collector.exec_list.insert(insertPos, tearDownName)
 
     @classmethod
-    def _exec_cases(cls, meta):
+    def _exec_cases(cls, meta,event):
         B = 'case_default';
         A = 'case';
         test_setup = meta.get(_N);
         test_teardown = meta.get(_O)
         for case in meta[_A]:
-            case_className = type(case).__name__;
-            cls.caseId += 1;
-            signal.enter_case(cls.caseId, case.name, case_className);
+            while not event.is_set():
+                logger.warn('Wait for recover')
+                for dir, item in already_setup.items():
+                    logger.info(f'开始恢复-{dir} suite_setup')
+                    try:
+                        item()
+                    except Exception as e:
+                        raise Exception(f'"{dir}" :恢复原先状态失败\n{e}')
+                        return 3
+                event.set()
+            case_className = type(case).__name__
+            cls.caseId += 1
+            signal.enter_case(cls.caseId, case.name, case_className)
             caseSetup = getattr(case, 'setup', _F)
             if caseSetup:
                 signal.setup(case.name, A)
