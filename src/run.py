@@ -81,13 +81,14 @@ def run() :
 
     print(f'''           
     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *     
-    *       hytest {version}            www.byhy.net   *
+    *       hytest {version}            www.byhy.net       *
     *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
     '''
     )
 
     os.makedirs('log/imgs', exist_ok=True)
 
+    print(f'\n<=== collecting test cases begin ===>\n')
     Collector.run(
         casedir=args.case_dir,
         suitename_filters=args.suite,
@@ -97,6 +98,7 @@ def run() :
         )
 
     # 0 表示执行成功 , 1 表示有错误 ， 2 表示没有可以执行的用例
+    print(f'\n<=== execute test cases ===> \n')
     return Runner.run()
 
 

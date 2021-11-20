@@ -35,7 +35,7 @@ body {
 .result_table{
     border-collapse: collapse;
     border: 1px solid #f0e0e5;
-    width: 28em;
+    width: 30em;
     text-align: center;
     font-size: 1.0em;
 }
@@ -46,7 +46,7 @@ body {
 }
   
 .result_barchart{  
-    width: 40em;
+    width: 30em;
     margin: 0 5em 0 5em;
 }
   
@@ -54,13 +54,15 @@ body {
     margin: 2em 0;
 }
   
-  .barchart_barbox {
+.barchart_barbox {
     margin: 0.5em 0;
     width: 100%;
-    background-color: #ddd;
+    background-color: #fff;
+    border: 1px solid #86c2dd;
+    border-radius: .2em;
 }
   
-  .barchart_bar {
+.barchart_bar {
     text-align: right;
     color: white;
 }

@@ -1,4 +1,5 @@
 from .utils.signal import signal
+from .utils.runner import Runner
 from datetime import datetime
 
 
@@ -28,20 +29,33 @@ def STEP(stepNo:int,desc:str):
     signal.step(stepNo,desc)
 
 
-def CHECK_POINT(desc:str, condition):
+def CHECK_POINT(desc:str, condition, failStop=True, LogSreenWebDriverIfFail = None):
     """
     检查点
 
     参数：
-    @param desc :   检查点文字描述
-    @param condition ： 检查点 表达式
+    @param desc :   检查点 文字描述
+    @param condition : 检查点 表达式
+    @param failStop : 检查点即使不通过也继续
+    @param LogSreenWebDriverIfFail ： 如果检查错误，需要截屏，提供的webdirver对象
     """
 
     if condition:
         signal.checkpoint_pass(desc)
     else:
         signal.checkpoint_fail(desc)
-        raise AssertionError()
+
+        # 如果需要截屏
+        if LogSreenWebDriverIfFail is not None:
+            SELENIUM_LOG_SCREEN(LogSreenWebDriverIfFail)
+
+        # 记录下当前执行结果为失败
+        Runner.curRunningCase.execRet='fail'
+        Runner.curRunningCase.error='检查点不通过'
+        Runner.curRunningCase.stacktrace="\n"*3+'具体错误看测试步骤检查点'
+        # 如果失败停止，中止此测试用例
+        if failStop:
+            raise AssertionError()
 
 def LOG_IMG(imgPath: str, width: str = None):
     """
