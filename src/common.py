@@ -1,43 +1,61 @@
 from .utils.signal import signal
 from .utils.runner import Runner
 from datetime import datetime
+from .cfg import l
 
+class _GlobalStore:
+    def __getitem__(self, key, default=None):
+        if hasattr(self, key):
+            return getattr(self, key)
+        else:
+            return default
+    def __setitem__(self,key,value):
+        setattr(self, key, value )
 
+    get = __getitem__
 
-# 存储 全局共享 数据
-GSTORE = {}
+# used for storing global shared data
+GSTORE = _GlobalStore()
 
 def INFO(info):
     """
-    在日志和测试报告中打印 重要信息，
-    使得 运行报告更加清晰
+    print information in log and report.
+    This will not show in terminal window.
 
-    参数：
-    @param info :   信息描述
+    Parameters
+    ----------
+    info : object to print
     """
     signal.info(f'{info}')
 
 def STEP(stepNo:int,desc:str):
     """
-    在日志和测试报告中打印出 测试步骤说明，
-    使得 运行报告更加清晰
+    print information about test steps in log and report .
+    This will not show in terminal window.
 
-    参数：
-    @param stepNo : 指定 是第几步
-    @param desc :   步骤描述
+
+    Parameters
+    ----------
+    stepNo : step number
+    desc :   description about this step
     """
     signal.step(stepNo,desc)
 
 
-def CHECK_POINT(desc:str, condition, failStop=True, LogSreenWebDriverIfFail = None):
+def CHECK_POINT(desc:str, condition, failStop=True, failLogScreenWebDriver = None):
     """
-    检查点
+    check point of testing.
+    pass or fail of this check point depends on argument condition is true or false.
+    it will print information about check point in log and report.
 
-    参数：
-    @param desc :   检查点 文字描述
-    @param condition : 检查点 表达式
-    @param failStop : 检查点即使不通过也继续
-    @param LogSreenWebDriverIfFail ： 如果检查错误，需要截屏，提供的webdirver对象
+    Parameters
+    ----------
+    desc :    check point description, like check what.
+    condition : usually it's a bool expression, like  `a==b`, 
+        so actually, after evaluating the expression, it's a result bool object passed in .
+    failStop : switch for whether continue this test cases when the condition is false 
+    failLogScreenWebDriver : Selenium web driver object,
+        when you want a screenshot image of browser in test report if current check point fail.
     """
 
     if condition:
@@ -46,23 +64,25 @@ def CHECK_POINT(desc:str, condition, failStop=True, LogSreenWebDriverIfFail = No
         signal.checkpoint_fail(desc)
 
         # 如果需要截屏
-        if LogSreenWebDriverIfFail is not None:
-            SELENIUM_LOG_SCREEN(LogSreenWebDriverIfFail)
+        if failLogScreenWebDriver is not None:
+            SELENIUM_LOG_SCREEN(failLogScreenWebDriver)
 
         # 记录下当前执行结果为失败
         Runner.curRunningCase.execRet='fail'
-        Runner.curRunningCase.error='检查点不通过'
-        Runner.curRunningCase.stacktrace="\n"*3+'具体错误看测试步骤检查点'
+        Runner.curRunningCase.error=('检查点不通过','checkpoint failed')[l.n]
+        Runner.curRunningCase.stacktrace="\n"*3+('具体错误看测试步骤检查点','see checkpoint of case for details')[l.n]
         # 如果失败停止，中止此测试用例
         if failStop:
             raise AssertionError()
 
 def LOG_IMG(imgPath: str, width: str = None):
     """
-    在日志中加入图片
+    add image in test report
 
-    @param imgPath: 插入日志的图片路径
-    @param width:  图片html 显示宽度， 可以是 50% / 800px / 30em 这些格式
+    Parameters
+    ----------
+    imgPath: the path of image
+    width:  display width of image in html, like 50% / 800px / 30em 
     """
 
     signal.log_img(imgPath, width)
@@ -70,10 +90,13 @@ def LOG_IMG(imgPath: str, width: str = None):
 
 def SELENIUM_LOG_SCREEN(driver, width: str = None):
     """
+    add screenshot image of browser into test report when using Selenium
     在日志中加入selenium控制的 浏览器截屏图片
 
-    @param driver: selenium webdriver对象
-    @param width:  图片html 显示宽度， 可以是 50% / 800px / 30em 这些格式
+    Parameters
+    ----------
+    driver: selenium webdriver
+    width:  display width of image in html, like 50% / 800px / 30em 
     """
     filename = datetime.now().strftime('%Y%m%d%H%M%S%f')
     filepath = f'log/imgs/{filename}.png'

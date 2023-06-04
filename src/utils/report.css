@@ -1,7 +1,9 @@
 body {    
     font-family: consolas, Verdana, sans-serif;
-    font-size: .92em;
+    font-size: .95em;
     color: #696e71;
+    display: grid;
+    grid-template-columns: 1fr 5rem;
 }
 
 .main_section {   
@@ -51,7 +53,7 @@ body {
 }
   
 .barchar_item{
-    margin: 2em 0;
+    margin: 2.5rem 0;
 }
   
 .barchart_barbox {
@@ -64,7 +66,7 @@ body {
   
 .barchart_bar {
     text-align: right;
-    color: white;
+    height: 1.2rem;
 }
   
   
@@ -81,7 +83,7 @@ body {
 .info
 {
     white-space:pre-wrap;
-    padding: .6em;
+    margin: .8em 1.5em;
 }
 
 

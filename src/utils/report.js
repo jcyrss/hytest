@@ -23,7 +23,7 @@ function toggle_folder_all_cases(){
     let eles = document.querySelectorAll(".folder_body");
     
     FOLDER_ALL_CASES = !FOLDER_ALL_CASES;
-    document.getElementById('display_mode').innerHTML = FOLDER_ALL_CASES? "详细" : "精简"
+    document.getElementById('display_mode').innerHTML = FOLDER_ALL_CASES? "Detail" : "Summary"
 
     for (const ele of eles){
         ele.style.display =  FOLDER_ALL_CASES? "none": "block"
