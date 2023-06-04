@@ -22,7 +22,7 @@ So, if you like Robot Framework's way of setup/teardown,  and want to write test
 Documentation
 ------------
 
-[Github Documentation](https://github.com/jcyrss/hytest/Documentation.md)
+[Github Documentation](https://github.com/jcyrss/hytest/blob/main/Documentation.md)
 
 
     

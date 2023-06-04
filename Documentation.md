@@ -114,7 +114,9 @@ Command line window show test execution info and result.
 
 Besides, you will find a new folder call 'log' created in the project dir, within it there are test report and test log files.
 
-By default, the test report will be open in browser automatically after testing. You could disable that by add argument `--auto_open_report no`  in command line.
+By default, the test report will be open in browser automatically after testing. 
+
+You could disable that by add argument `--auto_open_report no`  in command line.
 
 
 <br>
@@ -701,7 +703,7 @@ class LoginUI:
         # access test parameter data by 'self.para'
         username, password = self.para
         
-        # 下面是登录测试代码
+        # the follwing a login test code
 ```
 
 When executing test, hytest will create 6 instances of the above class,
@@ -730,7 +732,7 @@ class UI_000x:
     for i in range(10):
         ddt_cases.append({
             'name': f'Login UI_000{i+1}',
-            'para': [None, f'{i+1}'*8,'请输入用户名']
+            'para': ['byhy', f'{i+1}'*8]
         })
  
     def teststeps(self):
