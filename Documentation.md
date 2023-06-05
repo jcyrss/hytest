@@ -1,8 +1,5 @@
 ## Introduction
 
-
-<a href='http://www.byhy.net/tut/auto/hytest/01/' target='_blank'>中文教程链接</a>
-
 `hytest` is a generic open source test-automation framework. It's mainly but not only used for QA system testing.
 
 Maybe your first question is what's the difference comparing it with `pytest` or `Robot Framework`?
@@ -955,7 +952,7 @@ Like,
 
 
 ```py
-hytest --report_title "round 2 of regression test"
+hytest --report_title "Regression Test Round #2"
 ```
 
 

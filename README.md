@@ -1,7 +1,4 @@
-Introduction
-------------
-
-[中文教程](https://www.byhy.net/tut/auto/hytest/01/)
+## Introduction
 
 `hytest` is a generic open source test-automation framework. It's mainly but not only used for QA system testing.
 
@@ -17,19 +14,22 @@ But Robot Framework creates its own "language" to write test cases instead of us
 So, if you like Robot Framework's way of setup/teardown,  and want to write tests in python, you could try hytest.
 
 
+## Installation
+
+```py
+pip install hytest
+```
+
+##　Documentation
+
+[User Guide](https://github.com/jcyrss/hytest/blob/main/Documentation.md)
 
 
-Documentation
-------------
-
-[Github Documentation](https://github.com/jcyrss/hytest/blob/main/Documentation.md)
+[中文教程链接](https://www.byhy.net/tut/auto/hytest/01/)
 
 
-    
+## Screenshots
 
+![image](https://github.com/jcyrss/hytest/assets/10496014/ff227feb-b2ec-4b4e-aa76-caa6e0dd0936)
 
-
-
-
-
-
+![image](https://github.com/jcyrss/hytest/assets/10496014/4d25fc5d-8fec-4db1-ab2b-d84ecbc06004)
