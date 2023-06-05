@@ -20,7 +20,7 @@ So, if you like Robot Framework's way of setup/teardown,  and want to write test
 pip install hytest
 ```
 
-##　Documentation
+## Documentation
 
 [User Guide](https://github.com/jcyrss/hytest/blob/main/Documentation.md)
 
