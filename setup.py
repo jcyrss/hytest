@@ -17,7 +17,7 @@ with open('README.md', encoding='utf8') as f:
 setup(
     name         = 'hytest',
     version      = version,
-    author       = '白月黑羽 - Jiangchunyang',
+    author       = 'baiyueheiyu 白月黑羽',
     author_email = 'jcyrss@gmail.com',
     url          = 'https://github.com/jcyrss/hytest',
     download_url = 'https://pypi.python.org/pypi/hytest',
