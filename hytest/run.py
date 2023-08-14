@@ -147,7 +147,9 @@ def run() :
             )
     except:
         print(traceback.format_exc())
-        print('\n\n!! Collect Test Cases Exception Aborted !!\n\n')
+        print(('\n\n!! 搜集用例时发现代码错误，异常终止 !!\n\n', 
+               '\n\n!! Collect Test Cases Exception Aborted !!\n\n')[l.n])
+        exit(3)
 
 
     
