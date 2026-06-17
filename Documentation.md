@@ -1,202 +1,176 @@
+---
+title: hytest Framework
+---
+
+
 ## Introduction
 
-`hytest` is a generic open source test-automation framework. It's mainly but not only used for QA system testing.
+`hytest` is suitable for black-box system test automation.
 
-Maybe your first question is what's the difference comparing it with `pytest` or `Robot Framework`?
+It has the following advantages:
 
-Well, I like the way of setup/teardown of Robot Framework over that of pytest.
+- Very easy to get started
 
-The former is simpler and more intuitive than the latter. The order of multiple layer's setup/teardown is strictly obeyed, which is especially critical for system testing. But that of pytest is not very strict, [see this](https://github.com/pytest-dev/pytest/issues/7416)
+  hytest lets you write test cases directly in Python.
 
-But Robot Framework creates its own "language" to write test cases instead of using python directly. It's much less flexible to write test cases, and it makes it hard to deal with complex data structure. 
+  If you have Python programming experience, you can get started in one hour and use it flexibly within one day.
 
-<br>
+- Intuitive and easy to understand
 
-So, if you like Robot Framework's way of setup/teardown,  and want to write tests in python, you could try hytest.
+  Test cases are stored in a directory/file structure, which is clear and straightforward.
+
+  The `setup and teardown` mechanism is clear and flexible.
+
+  You can flexibly **select** the test cases you want to execute.
+
+- Beautiful test reports
 
 
+## Installation and Execution
 
+Installing hytest is very simple. Run the following command:
 
-##  Installation
+```
+pip install hytest 
+```
 
-hytest requires Python 3.8 or newer
+Note: hytest requires Python 3.9 or later.
 
-simply run:
+Before running hytest automation, create a new `project directory`, and then create a subdirectory named `cases` inside it to store test case code.
+
+Running hytest automated tests is very simple. You only need to:
+
+- Open a command-line window.
+
+- Go to the root directory of the automation code, that is, the `parent directory of cases`.
+
+- Run hytest.
+
+The command `hytest` is actually equivalent to running the following command:
+
+```
+python -m hytest
+```
+
+If you are using macOS, you can run:
+
+```
+python3 -m hytest
+```
+
+After execution, the command-line window displays the result of each test case.
+
+Running the automation will generate a `log` directory. It contains detailed `test logs` and a `test report`.
+
+The `test log` is a txt file.
+
+The `test report` is in HTML format and will be automatically opened in the browser. Through the floating menu in the upper-right corner, you can:
+
+- Switch between compact and detailed modes.
+
+  This makes it easier to browse the content.
+
+- Jump to the next or previous error.
+
+  This makes it easier to quickly locate the problem when an issue occurs.
+
+By default, the language of the test report uses the operating system language. If you want to specify it explicitly, add the `--lang` parameter.
+
+For example:
 
 ```py
-pip install hytest
+hytest  --lang=en
+
+or
+
+python -m hytest  --lang=en
 ```
 
-
-then, run the following command to create a test-automation project folder with name 'myauto'
+If you do not want the test report to open automatically after the test finishes, you can use the `--auto_open_report=no` parameter, as shown below:
 
 ```py
-hytest --new myauto
+hytest --auto_open_report=no
 ```
 
-Replace  `myauto` with your project name.
+The usage of hytest command-line parameters will be explained in detail later. If you forget a command parameter in the future, you can run `hytest -h` to view the parameter description.
 
-<br>
+When building real project automation later, you usually need to create some other directories, such as:
 
-If error message pops up to tell you command  `hytest`  not found, run the following command instead
+- `lib` directory
+
+  Used to store shared code libraries needed by test cases.
+
+- `doc` directory
+
+  Used to store documentation.
+
+You can use the command-line parameter `--new` to create a hytest automation project directory. It will contain a `cases` directory and a sample code file.
+
+For example, running:
 
 ```py
-python -m hytest.run --new myauto
+hytest --new auto1
 ```
 
-
-<br>
-
-Now, you will find the project folder is created, and there is a sub-folder called  `cases` in it.
-
-As you could imagine, the test cases files should be put there, and there is a sample test cases file with its name 'case1.py'.
-
-We will elaborate on how to write test cases later, now let run it to see what happen.
-
-<br>
-
-Just open a command line window, change current directory to path of the project folder.
-
-In that path, run  `hytest`  or  `python -m hytest.run`, you should see the output like the following.
-
-```
-    *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
-    *       hytest 0.8.5            www.byhy.net       *
-    *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
+will create a project directory named `auto1` under the current directory.
 
 
+## Test Case Directory Structure
 
-===   [ collect test cases ]  ****  ===
+First, let us understand the structure of the test case directory.
 
+- A hytest `automated test case` is a Python class written in a Python file.
 
-== cases\case1.py
+  It corresponds to a test case in a test case document.
 
+- One code file can contain multiple test cases.
 
+- Multiple code files can be organized using directories.
 
-===   [ execute test cases ]  ===
+Every `directory` and `py` file under the `cases` directory is called a `test suite`.
 
-Number of cases to run : 1
+A `test suite` is a `collection of test cases`. In simple terms, it is `a group of test cases`.
 
+For easier management, we group functionally related test cases together into a test suite.
 
+- A Python file that contains `test case classes` is called a `suite file`.
 
->>> cases\case1.py
-
-* test case name - 0001
-                          PASS
-
-
-  ========= Duration Of Testing : 0.003 seconds =========
-
-
-  number of cases to run : 1
-
-  number of cases actually run : 1
-
-  passed : 1
-
-  failed : 0
-
-  exception aborted : 0
-
-  suite setup failed : 0
-
-  suite teardown failed : 0
-
-  cases setup failed : 0
-
-  cases teardown failed : 0
-```
-
-Command line window show test execution info and result.
-
-Besides, you will find a new folder call 'log' created in the project dir, within it there are test report and test log files.
-
-By default, the test report will be open in browser automatically after testing. 
-
-You could disable that by add argument `--auto_open_report no`  in command line.
+- A directory that contains suite files is called a `test suite directory`.
 
 
-<br>
+## Defining Test Case Classes
 
-You could run  `hytest -h`  to check command line arguments
+The test case file format is as follows:
 
+Each class in the file corresponds to one test case.
 
+- The class attribute `name` specifies the test case name.
 
+  If there is no `name` attribute, the class name will be used as the test case name.
 
+- The class method `teststeps` corresponds to the test step code.
 
-## organization of test cases 
+  Test step code is the program that executes the test case step by step automatically.
 
+  Therefore, a class **must have a teststeps method** before hytest treats it as a test case class.
 
-let's see how automation test cases are organized in hytest.
-
-Here, we could call automation test cases  `hytest cases` 
-  
-- usually, every `hytest case`  is a class definition.
-
-  Every one is related to a test cases in your test documentation.
-
-- a python code file could contain multiple hytest cases.
-
-  So that python code file is a  `test suite` containing hytest cases
-  
-  We also call that python code file  `hytest suite file` 
-   
-- a folder could contain multiple hytest suite files.
-  
-  So that folder is also a  `test suite` containing hytest cases.
-  
-  We also call that folder  `hytest suite folder` 
-
-  a hytest suite folder could contain multiple other suite folders which could contain other folders recursively.
-
-- by default, the folder with name  `cases` will be as root suite folder.
-  
-  That could be changed by set command line positional argument to other name, like
-
-  ```py
-  hytest anothercasesdir
-  ```
-
-
-
-
-## hytest case definition
- 
-
-usually, every `hytest case`  is a class definition, like 
-
+For example:
 
 ```py
-# better class name contains ID of the test case 
+# Recommendation: use the test case ID as the class name
 class UI_0101:
-    name = 'administrator operations - UI-0101'
+    # Test case name. It is also recommended to end with the test case ID,
+    # so it can correspond to the test case document
+    # and make it easier to select by test case name later.
+    name = 'Admin Home Page - UI-0101'
 
+    # Test case steps
     def teststeps(self):
-        
-        openOurWebSite()
-
-        getProductList()
 ```
 
+To make the execution process shown in our test logs and reports clearer, we can call some hytest library functions to output execution steps, informational messages, and checkpoint information.
 
-- Value of class attribute `name` is the name of test case.  
- 
-  if name attribute is missing，the class name will be treat as the name of test case.
-
-  Also better to put ID of the test case at the end of the name, that will facilitate filtering test cases to run later.
-
-- `teststeps` method contains executing steps of the test cases
-  
-  So, hytest only think of those classes **with method teststeps** as a `hytest case class` when it collects test cases before run test.
-
-
-<br>
-
-We could add some information to make test report/log more clear and easy to track, like print test steps or other executing information.
-
-To do that, call hytest library functions, like the following
-
-<br>
+Add the following code at the beginning of the file to import commonly used functions from the hytest library:
 
 ```py
 from hytest import STEP, INFO, CHECK_POINT
@@ -205,374 +179,342 @@ class UI_0101:
       
     def teststeps(self):
         
-        STEP(1,'open our web site')        
-        # imagine we get title bar string here
-        websiteTitle = "Tom's Store  Jan 1st, 2023" 
-        INFO(f'website title is {websiteTitle}')
-        CHECK_POINT('home page title', websiteTitle.startswith("Tom's Store") ) 
+        STEP(1, 'Open the browser')
+        var1 = 'sdf'
+        INFO(f'var1 is {var1}')
+        CHECK_POINT('Opened successfully', var1.startswith('1sd') ) 
 
         
-        STEP(2,'login')        
-        CHECK_POINT('login successfully', True) 
+        STEP(2, 'Log in')        
+        CHECK_POINT('Check whether login succeeded', True) 
     
-        STEP(3,'check menu') 
-        CHECK_POINT('menu info correct', True)  
+        STEP(3, 'View the menu') 
+        CHECK_POINT('Check whether the menu is correct', True)  
 ```
 
-<br>
+- The STEP function
 
-The output in test report looks like this
+  Used to declare each test step, making logs and reports clearer.
 
-![image](https://github.com/jcyrss/hytest/assets/10496014/8319faba-8dd7-4326-baf8-81e541b3c3cc)
+- The INFO function
 
+  Used to print information in logs and reports, making it easier to locate issues.
 
-<br>
+  Of course, during development and debugging, you can also use `print` directly and view the output in the terminal.
 
+- The CHECK_POINT function
 
-The output in test log looks like this
+  Used to declare each checkpoint in the testing process. If any checkpoint fails, the entire test case is considered failed.
 
-```
->>> cases\case1.py
+  The first parameter is the checkpoint description.
 
-* UI_0101  -  2023-06-02 11:21:35
+  The second parameter is the checkpoint expression, such as `result["retcode"] == 0`.
 
-  [ case execution steps ]
+  The third parameter indicates whether to continue executing the remaining code in the test case after the checkpoint fails.
 
--- Step #1 -- open our web site 
+  By default, if a checkpoint fails, the remaining test code after `teststeps` in that test case will not continue to execute.
 
-website title is Tom's Store  Jan 1st, 2023
+  If you want the subsequent code in `teststeps` to continue even when a checkpoint fails, you can use the parameter `failStop=False`, as shown below:
 
-** checkpoint **  home page title ---->  pass
-
-
--- Step #2 -- login 
-
-
-** checkpoint **  login successfully ---->  pass
-
-
--- Step #3 -- check menu 
-
-
-** checkpoint **  menu info correct ---->  pass
-
-  PASS 
-```
-
-
-- STEP  
-   
-  the function to print test steps in report/log.
-  the first argument is the number of the step.
-
-- INFO
-
-  the function to show other info you want add in report/log.
-
-  the only arguments could be any type. If it is not string, it will be convert to string first.
-
-- CHECK_POINT
-  
-  the function to validate check points in test cases.
-
-  
-  ```py  
-  def CHECK_POINT(desc:str, condition, failStop=True, failLogScreenWebDriver = None):
-      """
-      check point of testing.
-
-      pass or fail of this check point depends on argument condition is true or false.
-      it will print information about check point in log and report.
-
-      Parameters
-      ----------
-      desc :    check point description, like check what.
-
-      condition : usually it's a bool expression, like  `a==b`, 
-          so actually, after evaluating the expression, it's a result bool object passed in .
-
-      failStop : switch for whether continue this test cases when the condition is false 
-
-      failLogScreenWebDriver : Selenium web driver object,
-          when you want a screenshot image of browser in test report if current check point fail.
-    """
-  ```
-
-  <br>
-
-  Usually, execution of one test case will be terminated if one check failed.
-
-  But if you want to continue execute for some reasons, set argument  `failStop`  to False, like this
-
-   ```py   
+  ```py   
     def teststeps(self):
 
-        CHECK_POINT('not critical check', False, failStop=False)
+        CHECK_POINT('Do not stop even if this fails 1', False, failStop=False)
 
-        CHECK_POINT('critical check', False)
-   ```
-
-
-
-## setup and teardown
+        CHECK_POINT('Do not stop even if this fails 2', False, failStop=False)
+  ```
 
 
-Setup and teardown in hytest is pretty much like that in Robot Framework.
+## An Example
 
-There are 3 kinds of them, they are Setup/Teardown of
+We use the `Baiyue SMS system` as the system under test.
 
-- hytest test case
-- hytest suite file
-- hytest suite folder
+There is now a batch of test cases for this system that need to be automated.
+
+Let us first automate test case `UI-0101`. The test case is described as follows:
+
+```
+- Test case category
+  
+    Administrator login
+
+- Preconditions
+
+    An administrator exists in the system:
+
+    Account: byhy
+    Password: 88888888	
 
 
-### setup/teardown of test case
+- Test steps
 
-We could add setup/teardown method to a hytest test case, like
+    1. Log in to the Baiyue SMS system with the correct administrator account and password.
 
+    2. Check the left-side menu.
+
+
+- Expected results
+
+    1. Login succeeds.
+
+    2. The first three menu item names are:
+    
+    Customers
+    Medicines
+    Orders
+```
+
+The corresponding hytest test case reference code is as follows:
+
+```py
+from hytest import *
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+class UI_0101:
+
+    # Test case name
+    name =  'Check operation menu UI_0101'
+
+    # Test steps
+    def teststeps(self):
+
+        STEP(1, 'Log in to the website')
+
+        wd = webdriver.Chrome()
+        wd.implicitly_wait(10)
+
+        wd.get('http://127.0.0.1/mgr/sign.html')
+
+        wd.find_element(By.ID, 'username').send_keys('byhy')
+        wd.find_element(By.ID, 'password').send_keys('88888888')
+
+        wd.find_element(By.TAG_NAME, 'button').click()
+
+        STEP(2, 'Get left-side menu information')
+
+        eles = wd.find_elements(By.CSS_SELECTOR, '.sidebar-menu li span')
+
+        menuText = [ele.text  for ele in eles]
+
+        INFO(menuText)
+
+        STEP(3, 'Check the menu bar')
+
+        CHECK_POINT('Left-side menu check', menuText[:3] == ['Customers', 'Medicines', 'Orders'])
+
+        wd.quit()
+```
+
+
+## Setup and Teardown
+
+If we analyze carefully, the test case above needs to open a browser and log in.
+
+If there are 100 such test cases, the login operation will be executed 100 times.
+
+The focus of these test cases is actually not login, but the subsequent operations.
+
+The subsequent operations require the same initial environment: an environment where the browser is `opened and logged in`.
+
+Can the execution environment be shared?
+
+That is, when these test cases begin execution, they are already in an environment where the browser has been opened and logged in.
+
+In other words, when our test cases execute, they obtain a WebDriver object that corresponds to a browser already logged in with the administrator account. The later code can then use this WebDriver object directly to perform operations.
+
+How can automated test cases have an `initial environment` where the browser has already been opened and logged in when they execute?
+
+This requires an `initialization` operation, called `setup` in English.
+
+Initialization means building the required data environment for one or more test cases before they execute.
+
+The opposite operation of initialization is `cleanup`, called `teardown` in English.
+
+Initialization creates the environment, and cleanup `restores or destroys` the environment.
+
+Why do we need `cleanup` to restore the environment?
+
+Because after test cases finish executing, they may change the data environment. The changed data environment may affect the execution of other test cases.
+
+Therefore, the principle is:
+
+`Whoever` performs the `initialization` operation and makes `whatever change` to the environment
+
+should perform the corresponding `restoration` in the `cleanup` operation.
+
+hytest supports `three types` of setup/teardown:
+
+- Setup and teardown for a single test case
+- Setup and teardown for an entire test case file
+- Setup and teardown for an entire test case directory
+
+
+### Single Test Case
+
+Let us look at the first type:
+
+Setup and teardown for a single test case are implemented by adding `setup` and `teardown` methods to the class corresponding to the test case.
 
 ```py
 class c0101:
-    name = 'administrator home page - 0101'
+    name = 'Admin Home Page - UI-0101'
 
+    # Setup method
     def setup(self):
         open_browser()
         mgr_login()
 
+    # Teardown method
     def teardown(self):
         wd = GSTORE['wd']
         wd.quit()
 
+    # Test case steps
     def teststeps(self):        
 ```
 
+When hytest executes a test case:
 
-<br>
+- It first executes the code inside `setup`.
 
+- Then it executes the code inside `teststeps`.
 
-When hytest execute the above test cases class, it will
+- Finally, it executes the code inside `teardown`.
 
-- first,  run  `setup`  method
+In addition:
 
-- then, run  `teststeps`  method
+If `setup` fails, meaning an exception occurs, hytest will not execute the code inside `teststeps` or `teardown`.
 
-- at last, run  `teardown`  method
-
-
-And,if setup failed, which means there is exception raised,  hytest will not run method teststeps or teardown any more。
-
-If teststeps failed, which means there is exception raised,  hytest still will run teardown method.
+If `teststeps` fails, `teardown` will still be executed to ensure the environment is cleaned up.
 
 
+### Test Case File
 
-### setup/teardown of suite file
+Sharp readers must have noticed that the setup and teardown for a **single test case** above do not solve the previously mentioned problem of sharing a data environment among **multiple test cases**.
 
+In this situation, we can use `setup and teardown for the entire test case file`.
 
-
-If we need setup/teardown for all test cases in one  **hytest suite file** , we could add global functions  `suite_setup`  and  `suite_teardown`, like this
-
+That means adding global functions `suite_setup` and `suite_teardown` to the file, as shown below:
 
 ```py
 from hytest  import *
+from lib.webui import  *
+from time import sleep
 
 def suite_setup():
-    addProducts(100)
+    INFO('suite_setup')
+    open_browser()
+    mgr_login()
 
 def suite_teardown():
-    deleteProducts(100)
+    INFO('suite_teardown')
+    wd = GSTORE['wd']
+    wd.quit()
 
 class c0101:
-    name = 'administrator home page - 0101'
+    # Test case name
+    name = 'Admin Home Page - UI-0101'
 
     def teststeps(self):
-    # test steps code 
+    # Test case step code is omitted here    
 
 
 class c0102:
-    name = 'administrator home page - 0102'
+    name = 'Admin Home Page - UI-0102'
 
     def teststeps(self):
-    # test steps code   
+    # Test case step code is omitted here    
+
 ```
 
-<br>
+If a test case file has both `suite_setup` and `suite_teardown`, and the test cases inside it also have `setup` and `teardown`, the execution order is:
 
+- Execute the test case file's `suite_setup`.
 
-When hytest execute the above test cases class, it will
+- Execute each test case's `setup`, `teststeps`, and `teardown` in the file.
 
-- first,  run  `suite_setup`  function
+- Finally, execute the test case file's `suite_teardown`.
 
-- then, run all the test cases in suite file
 
-- at last, run  `suite_teardown`  function
+### Suite Directory
 
+We have just made it possible for all test cases in a test case file to share setup and teardown operations.
 
-If  suite_setup  failed, which means there is exception raised,  hytest will not run test cases or suite_teardown.
+What if the test cases in multiple test case files all need the same setup and teardown operations?
 
-<br>
+In this situation, we can use `setup and teardown for the entire test case directory`.
 
-If both suite_setup、suite_teardown and cases setup、teardown methods existing in one suite file, like
+How do we set common setup for a directory?
 
+Create a file named `__st__.py` under that directory.
 
-```py
-from hytest  import *
+As with suite files, setup and teardown for a suite directory are also implemented by adding global functions `suite_setup` and `suite_teardown` to the file.
 
-def suite_setup():
-    INFO('suite_setup: add 100 products')
-    addProducts(100)
+If a suite directory has `suite_setup` and `suite_teardown`, the test case files also have `suite_setup` and `suite_teardown`, and the test cases themselves also have `setup` and `teardown`, the execution order is:
 
-def suite_teardown():
-    INFO('suite_teardown: delete the 100 products added')
-    deleteProducts(100)
+- Execute the suite directory's `suite_setup`.
 
-class c0101:
-    name = 'administrator home page - 0101'
+- For each test case file under that directory:
 
-    def setup(self):
-        # case setup
+  - Execute the test case file's `suite_setup`.
 
-    def teardown(self):
-        # case teardown
+  - Execute each test case's `setup`, `teststeps`, and `teardown` in the file.
 
-    def teststeps(self):
-    # test steps code 
+  - Execute the test case file's `suite_teardown`.
 
+- Execute the suite directory's `suite_teardown`.
 
-class c0102:
-    name = 'administrator home page - 0102'
 
-    def setup(self):
-        # case setup
+### Default Setup and Teardown
 
-    def teardown(self):
-        wd = GSTORE['wd']
-        wd.quit()
+In addition to using `suite_setup` and `suite_teardown` to set up and clean up an entire suite, a `test case file` also supports another kind of setup and teardown: `default setup and teardown`.
 
-    def teststeps(self):
-    # test steps code   
-```
+This is done by defining global functions named `test_setup` and `test_teardown`.
 
-hytest will run them in the following order:
+If a global function `test_setup` is defined in a test case file, and a test case in that file `does not have its own setup` method, this `test_setup` will be used for initialization when the automation runs.
 
-- suite_setup
+If a global function `test_teardown` is defined in a test case file, and a test case in that file `does not have its own teardown` method, this `test_teardown` will be used for cleanup when the automation runs.
 
-- c0101 setup
 
-- c0101 teststeps
+## Data Association
 
-- c0101 teardown
-    
-- c0102 setup
+### Basic Usage
 
-- c0102 teststeps
+In setup operations, we often create some data that will be used by test cases executed later.
 
-- c0102 teardown
+For the `setup` method inside a test case class, this is simple, because the test steps and cleanup method belong to the same class.
 
-- suite_teardown
+When the hytest framework executes, it creates an instance of that class. Therefore, you only need to store the data in instance attributes.
 
+For the setup function of a test case file or suite directory, how can data generated by the `suite_setup` function be used by the test cases inside it?
 
-Case c0101 has higher execution order priority than case c0102 because it appears earlier. 
+You can use hytest's built-in object `GSTORE`.
 
-
-
-### setup/teardown of suite folder
-
-
-
-If we need setup/teardown for all test cases in one  **hytest suite folder** , we could create a python file with its name `__st__.py` in that suite folder, and add global functions  `suite_setup`  and  `suite_teardown` in it
-
-That's setup/teardown for whole **hytest suite folder**.  
-
-When we run testing, hytest will 
-
-- first, execute suite_setup of folder 
-
-- then, excute test suite file, including suite_setup of file and test cases and suite_teardown of file
-
-- at last, execute suite_teardown of folder
-
-
-<br>
-
-Suite folder could be nested, I think you could easily figure out execution order.
-
-If your are familiar with Robot Framework, it's easy to understand.
-
-
-<br>
-
-### default setup/teardown of test cases
-
-We could define global function with name `test_setup`, then all the test cases without its own  `setup` method, will use global function  `test_setup` as its setup method. So that could be called default setup of all test cases in that suite file. 
-
-
-We could define global function with name `test_teardown`, then all the test cases without its own  `teardown` method, will use global function  `test_teardown` as its setup method. So that could be called default teardown of all test cases in that suite file. 
-
-
-
-
-## data sharing across setup/teardown/teststeps
-
-In test automation, we often need to pass data created in setup to test steps and teardown method.
-
-It's very easy for class level setup/teststeps/teardown. 
-
-When hytest collecting test cases, it will create instance of hytest case classes, so we just need to assign those data to instance attributes, then other instance methods like teststeps/teardown could access them from those instance attributes.
-
-Like this,
-
-
-```py
-class c0101:
-    name = 'administrator home page - 0101'
-
-    def setup(self):
-        self.products = createProducts()
-
-    def teardown(self):
-        deleteProducts(self.products)
-
-    def teststeps(self):  
-        INFO(self.products)      
-        ...
-```
-
-
-
-<br>
-
-But how we share data created in setup functions of suite files or suite folders with test cases inside of them?
-
-Hytest provides a global var  `GSTORE`, you could use it like a simple dictionary.
-
-like this,
+You can assign and retrieve elements using dictionary-style syntax. For example:
 
 ```py
 from hytest import GSTORE
 
 def suite_setup():
-    GSTORE['env1 product id'] = createProduct()
+    GSTORE['environment1_product_id'] = createProduct()
     GSTORE['driver'] = webdriver.Chrome()
 
 def suite_teardown():
-    deleteProduct(GSTORE['env1 product id'])
+    deleteProduct(GSTORE['environment1_product_id'])
     GSTORE['driver'].quit()
 
 
 class c00303:
-    name = 'create order - API-0303'
+    name = 'Add Order - API-0303'
 
     def teststeps(self):
-        createOrder(productid=GSTORE['env1 product id'])
+        createOrder(productid=GSTORE['environment1_product_id'])
 ```
 
-<br>
-
-We could also put/get data in the attribute way, like
-
+GSTORE also supports assigning and retrieving values through attributes. For example:
 
 ```py
-from hytest import GSTORE
 def suite_setup():
     GSTORE.productId = createProduct()
     GSTORE.driver = webdriver.Chrome()
@@ -583,142 +525,110 @@ def suite_teardown():
 
 
 class c00303:
-    name = 'create order - API-0303'
+    name = 'Add Order - API-0303'
 
     def teststeps(self):
         createOrder(productid=GSTORE.productId)
 ```
 
+This is simpler to write, but the attribute name must comply with Python variable naming rules. For example, it cannot contain spaces, plus signs, minus signs, and similar characters.
 
 
-<br>
+### Dependency Injection
 
-One disadvantage of using GSTORE is, IDE does not know the type of data in GSTORE, so it cannot provide editing helper functionalities like attributes prompt.
+If you think writing `GSTORE.data1` or `GSTORE['data1']` in the code is too cumbersome, you can solve this with **dependency injection**.
 
-If you really need those IDE helps, you could define your own global shared data store.
+Directly pass the object name you need from GSTORE as a parameter to the `teststeps` method or to a `setup/teardown method/function`.
 
-You could create a python module file with name  `share.py`, the content is like 
+When hytest calls these methods, it checks the parameters and automatically assigns the object with the same name in GSTORE to that parameter.
 
-
-```py
-from selenium import webdriver
-class gs:
-    driver : webdriver.Chrome 
-    productId : int
-```
-
-then in test suite file or `__st__.py` , you could use it like
+For example:
 
 ```py
-from share import gs
-
 def suite_setup():
-    gs.productId = createProduct()
-    gs.driver = webdriver.Chrome()
+    GSTORE.productId = createProduct()
+    GSTORE.driver = webdriver.Chrome()
 
-def suite_teardown():
-    deleteProduct(gs.productId)
-    gs.driver.quit()
+# Dependency injection of GSTORE.driver 
+def suite_teardown(driver):
+    deleteProduct(GSTORE.productId)
+    driver.quit()
 
 
 class c00303:
-    name = 'create order - API-0303'
+    name = 'Add Order - API-0303'
 
-    def teststeps(self):
-        createOrder(productid=gs.productId)
+    # Dependency injection of GSTORE.productId 
+    def teststeps(self, productId):
+        createOrder(productid=productId)    
 ```
 
-<br>
 
-There are type hints in  `gs`  definition, so IDE could provides helps like attribute prompt/autocomplete.
+## Data-Driven Testing
 
+For example:
 
+A system has a batch of test cases for the login function. Their execution steps are almost the same, but the test parameters are different.
 
+For example:
 
+- Do not enter a username, and enter the correct password.
 
+- Enter a username that is one character shorter at the end than the correct username, and enter the correct password.
 
-## data driven
+- Enter a username that is one character longer at the end than the correct username, and enter the correct password.
 
-If a batch of test cases have almost the same test steps, just with different test data, we could separate test data out, and share the code the test steps. 
+- Enter a username that is one character shorter at the beginning than the correct username, and enter the correct password.
 
-Usually we called that  `data-driven`  tests.
+- Enter a username that is one character longer at the beginning than the correct username, and enter the correct password.
 
+- Enter the correct username, and do not enter a password.
 
+- Enter the correct username, and enter a password that is one character longer at the end than the correct password.
 
-<br>
-
-For example, we have 6 test cases about login functionality.
-
-They are login with one account (username:byhy, password:888888) by inputting
-
-- no user name, correct password
-- correct user name, no password
-- user name missing last char, correct password
-- user name plus one extra char, correct password
-- correct user name, password missing last char
-- correct user name, password missing plus one extra char
-
-
-<br>
-
-hytest support data-driven by the follwowing way
+In this case, you can use hytest's data-driven test case format. You only need to define it as follows:
 
 ```py
-class LoginUI:
-    # every item in ddt_cases is a dictionary and related to a test case, in the item:
-    # name value is the name of the test case, 
-    # para value is parameter of the test case.
+class c00003x:
+    # Each dictionary element in ddt_cases defines the data for one test case.
+    # Here, name is the test case name, and para is the test case parameter.
     ddt_cases = [
         {
-            'name': 'login UI_0001',
-            'para': [None, '888888', 'please input user name']
+            'name' : 'Login - 000031',
+            'para' : ['user001','888888']
         },
         {
-            'name': 'login UI_0002',
-            'para': ['byhy', None, 'please input password']
+            'name' : 'Login - 000032',
+            'para' : ['user0012','888888']
         },
         {
-            'name': 'login UI_0003',
-            'para': ['byh', '888888', 'wrong user name or password']
-        },
-        {
-            'name': 'login UI_0003',
-            'para': ['byhyy', '888888', 'wrong user name or password']
-        },
-        {
-            'name': 'login UI_0001',
-            'para': ['byhy', '88888', 'wrong user name or password']
-        },
-        {
-            'name': 'login UI_0002',
-            'para': ['byhy', '8888887', 'wrong user name or password']
-        },
+            'name' : 'Login - 000033',
+            'para' : ['ser001','888888']
+        }
     ]
-
     
+    # When the hytest framework executes, it automatically creates 3 test case instances.
+    # When calling teststeps, it sets the parameters of each test case in self.para.
+    # Test case code can directly get parameters from self.para.
     def teststeps(self):
-        # access test parameter data by 'self.para'
+        # Get parameters
         username, password = self.para
         
-        # the follwing a login test code
+        # The login test code is below
 ```
 
-When executing test, hytest will create 6 instances of the above class,
-and put each item of ddt_cases into those 6 instances in order as attribute  `para`, and call teststeps.
+In this way, we do not need to define so many test case classes, and the test data can also be stored centrally.
 
-So in teststeps method, we could get test parameter data by  `self.para`.
+Special note: once you define test cases using data-driven testing, the names of these test cases are no longer the class name, such as `UI_000x` in the code above. Instead, they are the names defined in the driver data, such as `Login UI_0001`, `Login UI_0002`, and `Login UI_0003`.
 
-<br>
-
-For data-driven class, don't define class attribute 'name', because there are many test cases, and their names are in ddt_cases
+Therefore, when selecting all the test cases above through command-line parameters during execution, you should use `hytest --test Login*`, not `hytest --test UI_000x`.
 
 
+### Dynamically Generating Driver Data
 
+hytest driver data is usually fixed data, but of course it can also generate some dynamic data.
 
-<br>
-
-Parameters of data-driven test cases could be created by dynamically, like 
-
+For example:
 
 ```py
 from hytest import *
@@ -729,88 +639,99 @@ class UI_000x:
     for i in range(10):
         ddt_cases.append({
             'name': f'Login UI_000{i+1}',
-            'para': ['byhy', f'{i+1}'*8]
+            'para': [None, f'{i+1}'*8, 'Please enter the username']
         })
  
     def teststeps(self):
         INFO(f'{self.para}')
 ```
 
-<br>
+hytest runs in two phases:
 
-When we run hytest, it will 
+- Collecting test cases
 
-- First, collect test cases.
+  In this phase, hytest searches for all test case classes in the code under the test case directories.
 
-  It collect test case classes, and create instances of them. Every instance is one test cases object.
-  
-- Then, run automation by calling those instance methods
+  It instantiates these classes, thereby creating `test case instance objects`.
 
+- Executing test cases
 
-<br>
+  It executes the `test case instance objects` created in the previous step one by one.
 
-Collecting is before running. So we could not use those data which create when running in  `ddt_cases` .
+Therefore, in the first step, **collecting and creating test case objects happens before executing test cases**.
 
-The following code is wrong,
+Therefore, `ddt_cases` **cannot use data that is generated only at test runtime**.
+
+For example:
 
 ```py
 from hytest import *
  
+# Suite setup
 def suite_setup():
-    GSTORE['data_1'] = 'some data'
+    GSTORE['ddt_cases_UI_000x'] = []    
+    for i in range(10):
+        GSTORE['ddt_cases_UI_000x'].append({
+            'name': f'Login UI_000{i+1}',
+            'para': [None, f'{i+1}'*8, 'Please enter the username']
+        }) 
   
 class UI_000x:
-    # the following code will be executed in collecting phase,
-    # at that time GSTORE['data_1'] is not created, so it's wrong.
-    ddt_cases = GSTORE['data_1']
+    # Want to use GSTORE data set by suite setup? This does not work ❌
+    # Because ddt_cases is executed in the collection phase, and suite_setup()
+    # has not been executed yet.
+    # At this time, GSTORE is still empty, so an error will be reported.
+    ddt_cases = GSTORE['ddt_cases_UI_000x']
 
     def teststeps(self):
         INFO(f'{self.para}')
 ```
 
 
+## Selecting Test Cases to Execute - By Name
 
+When executing automated tests, we often do not need to execute `all` test cases.
 
-## filter cases to run by name
+For example, smoke testing only needs to execute the smoke test cases.
 
-When we execute testing, we often don't need to run all of them.
+Or when debugging the automation of a test case you wrote, you only need to execute that one test case.
 
-For example, we just need to run those cases for smoke-testing.
+hytest can flexibly select the test cases to execute.
 
-Or we just want to debug the one test case in developing.
-
-Hytest let your pick which cases to run in the similar way with Robot Framework.
-
-<br>
-
-
-we could use command line switches  `--test`  or  `--suite`  to specify those cases to run. 
-
-Like the following,
+We can use the `--test` or `--suite` command-line parameters to specify which test cases or suites to execute, and wildcard matching is also supported.
 
 ```py
---test testA              # run the cases with exact name 'testA'
---test "order list"       # run the cases with exact name 'order list'
---test testA --test testB # run the cases with exact name 'testA' or 'testB'
---test test*              # run the cases with name starting with 'test'
-
---suite orders            # run the suites with exact name 'orders', so all cases in that suite will be run
+--test testA               # Execute the test case named testA
+--test testA --test testB  # Execute the test cases named testA and testB
+--test test*               # Execute test cases whose names start with test
+--suite OrderManagement    # Execute the suite named OrderManagement
 ```
 
-<br>
+For example, if we want to test only the `Medicine Management` suite:
 
-We suggest to put ID of test cases at the end of case name, like 'order list - 0101'
+```
+hytest --suite  MedicineManagement  
+```
 
-so we could pick that case to run by this way, save the trouble to write a long name.
+For example, if we want to test only the `UI - UI-0101` test case:
+
+```
+hytest --test  "UI - UI-0101"  
+```
+
+Because the test case name contains spaces, it must be enclosed in double quotation marks.
+
+Usually, our test case names include the test case ID at the end, making it very convenient to select test cases by ID.
+
+For example:
 
 ```
 hytest --test  *0101  
 ```
 
+This selects and executes the test case named `UI - UI-0101` in our exercise.
 
-<br>
-
-If you have a long list of test cases to run, like
+Suppose your test leader requires smoke testing, and the selected test case IDs are as follows:
 
 ```
 UI-0301
@@ -818,19 +739,17 @@ UI-0302
 UI-0303
 UI-1401
 UI-1402
-# and more
 ```
 
-We could run them in this way
+We can execute them like this:
 
 ```
-hytest --test *0301  --test *0302 --test *0303 --test *1401 --test *1402 # and more 
+hytest --test *0301  --test *0302 --test *0303 --test *1401 --test *1402
 ```
 
-That will make a very long command.
+Naturally, you may wonder: if there are too many test cases to execute, such as 1,000 test cases, would the command-line parameters become too long?
 
-
-Hytest support argument file, we could put all arguments in one file with name like `args` , and put one argument each line, like the following
+In this case, we can use a parameter file. Put all parameters in a parameter file. For example, create a parameter file named `args` with the following content:
 
 ```
 --test *0301
@@ -840,129 +759,161 @@ Hytest support argument file, we could put all arguments in one file with name l
 --test *1402
 ```
 
-Then, we just need to run `hytest -A args` to run all the cases in list.
+One parameter per line.
+
+Then the command only needs to be `hytest -A args`.
 
 
+## Selecting Test Cases to Execute - By Tag
 
-## filter cases to run by tags
-
-
-Hytest supports  filter cases to run by  `tags` .
-
-### add tags to test cases
+hytest also provides another way to select test cases: selecting by **tag**.
 
 
-To do that, first we need to add tags to test cases.
+### Adding Tags to Test Cases
 
-One cases could have multiple tags.
+We can add tags to test cases. Then, when running tests, we can specify tags to choose which test cases to run.
 
-For example, a test cases of login functionality could have 3 tags: login functionality, smoke test, UI test
+A tag is a description of a test case's attributes or characteristics.
 
+A test case can have multiple tags describing its attributes. For example, a login test case can have three tags: login function, smoke test, and UI test.
 
+hytest can choose whether to execute a test case according to the configured tags.
 
-<br>
+There are several ways to add tags to test cases:
 
-Hytest support adding tag to test cases in 2 different ways:
+- Global variable `force_tags`
 
-- by global var  `force_tags` 
-
-  If we define a global var named  `force_tags`  in hytest suite file like this,
-
-  ```py
-  force_tags = ['login functionality','smoke test','UI test']
-  ```
-
-  All the test cases in that file will have those 3 tags.
-
-
-
-  <br>
-
-  As you could imaging, if we defined a  `force_tags` in  `__st__.py` in hytest suite folder, all the test cases in that folder will have those 3 tags.
-
-
-- by the `tags` attribute of hytest case class
-  
-  If we define a `tags` attribute of hytest case class, like this
-
-  ```py
-  class Login00001:
-      tags = ['login functionality','smoke test','UI test']
-  ```
-
-  That test case will have those 3 tags.
-
-
-
-### filter cases by tags
-
-When we run test, 2e could filter cases to run by tags.
-
-Like,
+If we define a global variable named `force_tags` in a test case file, in the following format:
 
 ```py
-# run cases with 'smoke test' tag. Double quote is needed due to space char in tag. 
---tag "smoke test"  
+force_tags = ['LoginFunction', 'SmokeTest', 'UITest']
+```
+
+then all test cases in that file will have these tags.
+
+Tags must be placed in a list, even if there is only one tag.
+
+If `force_tags` is defined in the `__st__.py` file of a **test suite directory**, then **all test cases in that directory** will have the tags specified in `force_tags`.
+
+- The `tags` attribute of a test case class
+
+If we define an attribute named `tags` in a test case class, in the following format:
+
+```py
+class c00001:
+    name = 'Add Order - 00001'
+    # Test case tags, optional   
+    tags = ['LoginFunction', 'SmokeTest', 'UITest']
+```
+
+then this test case will have these tags.
 
 
-# run cases without 'smoke test' tag.
---tagnot "smoke test"  
+### Selecting by Tag
+
+When executing automation, we can specify tags through command-line parameters to select test cases to execute.
+
+For example:
+
+```py
+# Execute test cases that contain the tag 'SmokeTest'. 
+--tag SmokeTest  
 
 
-# run cases with both 'smoke test' and 'UITest' tags. Note how Double quote and single quote are used here
---tag "'smoke test' and 'UITest'"
+# Execute test cases that do not contain the tag 'SmokeTest'.
+--tagnot SmokeTest 
 
 
-# run cases with either 'smoke test' or 'UITest' tags
---tag "smoke test" --tag UITest
+# Execute test cases that have both the SmokeTest and UITest tags.
+--tag "'SmokeTest' and 'UITest'"
 
 
-# run cases with tag name like A*B, like A5B， AB， A444B, etc
+# Execute test cases that have either the SmokeTest or UITest tag.
+--tag SmokeTest   --tag UITest
+
+
+# Execute test cases whose tag matches the pattern A*B, such as A5B, AB, or A444B.
 --tag A*B    
 ```
 
 
-## debugging
+## Selecting Test Cases to Execute - Specify Directories and Files
 
+If we only want to execute test cases under a certain `test suite directory` or a specific test case file, what should we do?
 
-When we run hytest, actually it is to run the following command
-
-```
-python -m hytest.run
-```
-
-So, when we debug code, we need to set IDE accordingly.
-
-
-Take Pycharm for example, we need to set  `Debug Configurations` like the following
-
-![image](https://github.com/jcyrss/hytest/assets/10496014/49338678-e5c5-4ca8-b4c4-8c5b1fe33782)
-
-
-
-
-
-
-## set title of test report
-
-
-We could use command line argument `--report_title` to set title of test report.
-
-Like,
-
+We can directly specify the path of that directory or file:
 
 ```py
-hytest --report_title "Regression Test Round #2"
+hytest cases/order cases/user
 ```
 
+This executes all test cases in the files under the `cases/order` and `cases/user` directories.
+
+We can also directly specify certain test case files:
+
+```py
+hytest cases/a/c/t1.py  cases/a/c/t2.py cases/a/b/t3.py
+```
+
+This executes all test cases in the three test case files: `cases/a/c/t1.py`, `cases/a/c/t2.py`, and `cases/a/b/t3.py`.
+
+Of course, directories and files can also be mixed:
+
+```py
+hytest cases/a/c/t1.py  cases/f cases/a/b cases/a/c/t2.py
+```
+
+If the specified directory or file does not exist, hytest will report an error and exit.
+
+<br>
+
+If a specified directory contains another specified directory or file, the included directory or file will be directly removed from the execution target list.
+
+For example:
+
+```
+hytest cases/a cases/a/c/t1.py
+```
+
+is equivalent to directly executing:
+
+```
+hytest cases/a
+```
+
+because the `cases/a` directory already contains the `cases/a/c/t1.py` file.
 
 
-## add images into report
+## Other Features
 
-If you were developing UI automation with Selenium or Appium, you could use hytest function `SELENIUM_LOG_SCREEN` to save screenshot image to test report.
+### Specifying the Test Report Title
+
+Use the `--report_title` parameter to specify the test report title.
+
+For example:
+
+```py
+hytest --report_title Regression_Test_Round_2_Report
+```
+
+<br>
+
+If the title needs to contain spaces, enclose it in double quotation marks, as shown below:
+
+```py
+hytest --report_title "Regression Test Round 2 Report"
+```
+
+<br>
+
+Note: this feature was newly added in `hytest v0.8.2`.
 
 
-Like
+### Adding Images to the Report
+
+When using Selenium for web automation or Appium for mobile automation, you can use the `SELENIUM_LOG_SCREEN` function in the hytest library to take screenshots and write them into the test report.
+
+As shown below:
 
 ```py
 from hytest import *
@@ -974,16 +925,16 @@ class c1:
         self.driver = webdriver.Chrome()
         self.driver.get('http://192.168.56.103/sign.html')
 
-        # The first argument is webdriver object
-        # argument 'width' is optional to specify the width of the image in web page.
+        # The first parameter is the webdriver object.
+        # The width parameter is optional and specifies the image display width.
         SELENIUM_LOG_SCREEN(driver, width='70%') 
 ```
 
 <br>
 
-You also could use hytest function `LOG_IMG` to put existing image file to test report.
+If you want to directly insert an already generated image into the report, you can use the `LOG_IMG` function in the hytest library.
 
-Like
+As shown below:
 
 ```py
 from hytest import *
@@ -993,64 +944,52 @@ class c1:
 
     def teststeps(self):
 
-        # could be URL of an online image.
+        # The first parameter is the image path, which can be a web URL.
         LOG_IMG('http://www.byhy.net/xxx.png')
-
-        # could be the relative path of a local image file relative to project root path.
+        # It can also be a local path relative to the report file.
         LOG_IMG('imgs/abc.png')
-
-        # could be the absolute path of a local image.
-        LOG_IMG('d:/car.png', width='70%')
+        # The width parameter is optional and specifies the image display width.
+        LOG_IMG('imgs/abc.png', width='70%')
 ```
 
 
+### Triggering Execution in Jenkins
 
-## work with Jenkins
+When hytest is executed with the `--report_url_prefix` parameter,
 
+for example: `hytest --report_url_prefix http://192.168.5.156`,
 
+after the test finishes, the test report will be copied to the `reports` directory of the automation project.
 
-If we need to check test report from Jenkins, first we need to start an extra web server in the machine running hytest for viewing hytest report.
+The test will also print a line similar to the following when it finishes:
 
-Since hytest is running in Python, we could use Python built-in library  `http`.
+```
+Test report: http://192.168.5.156/report_20230108_180546.html
+```
 
-Enter hytest project root folder in commandline, and run the following command
-  
+<br>
+
+Therefore, before execution, we should start a web service for viewing test reports.
+
+For example, execute the following in the automation test project directory:
+
 ```py
 python -m http.server 80 --directory reports
 ```
 
-It will start a web server serving static files with the folder `reports`  as content root.
+This uses the `reports` directory under the current directory as the web access root directory.
 
-Say the IP address of machine running hytest is  `192.168.5.156` , we could view all html files under the folder `reports` by url `http://192.168.5.156/xxxx.html`
+If the IP address of the test execution host is 192.168.5.156,
 
-
-
-<br>
-
-How can we make hytest put test report file under the folder `reports`?
-
-When we run hytest with argument  `--report_url_prefix`, like
-
-```
-hytest --report_url_prefix http://192.168.5.156
-```
-
-After testing finished, hytest will copy report file into a folder named `reports` under project root.
-
-And the console output will end with the following
-
-```
-test report : http://192.168.5.156/report_20230108_180546.html
-```
+you can view the test report through `http://192.168.5.156`.
 
 <br>
 
+Assume the path of the hytest automation project directory to be executed is `d:/my/elife_autotest`.
 
+In a Windows environment, if you want to directly execute a Pipeline containing hytest automated tests on the Jenkins controller host,
 
-Say hytest running in a Windows machine, and automation project path here is `d:/myautomation` 
-
-We could set `Jenkinsfile` of Jenkins Pipeline like this 
-
+you can configure the Pipeline `Jenkinsfile` like this:
 
 ```java
 pipeline {
@@ -1066,7 +1005,7 @@ pipeline {
         
         stage('Test') {
             steps {
-                dir("d://myautomation") {
+                dir("d://my//elife_autotest") {
                     bat "hytest --report_url_prefix http://192.168.5.156"
                 }
             }
@@ -1077,14 +1016,94 @@ pipeline {
 ```
 
 <br>
-
-After Jenkins finish this task, the result will include all the content hytest console outputs, including the last line like 
-
-
-```
-test report : http://192.168.5.156/report_20230108_180546.html
-```
  
-It's a link, we could just click it from Jenkins webpage to jump to the web site serving hytest report to view detail information of the test execution.
+After Jenkins runs, the build result will include the console output of hytest, which includes the test results and report link. This makes it convenient to view them from the Jenkins UI.
 
 
+### Integration with Other Systems
+
+During test execution, hytest emits events such as `test execution starts`, `each test case execution result`, and `test execution finishes`.
+
+Developers can write their own code to handle these events and integrate hytest with other systems used in testing.
+
+For example, during the test process, you may want to write the test result to a test record system every time a test case finishes.
+
+This test record system could be an Excel file, or it could be a test management system such as JIRA.
+
+<br>
+
+This code can be defined in the `__st__.py` file under the hytest test case root directory.
+
+<br>
+
+The code example below shows how to dynamically write test results to an Excel test case execution record file during the test process.
+
+```py
+class MySignalHandler:
+    TEST_RET_COL_NO = 6 # Column number of the test result in the test case Excel file
+
+    def __init__(self):
+        self.caseNum2Row = {} # Test case ID -> row number mapping table
+        self.getCaseNum2RowInExcel()
+        
+        # Run pip install pypiwin32 to ensure the library containing win32com is installed.
+        import win32com.client
+        self.excel = win32com.client.Dispatch("Excel.Application")
+        self.excel.Visible = True
+        workbook = self.excel.Workbooks.Open(r"h:\tcs-api.xlsx")
+        self.sheet = workbook.Sheets(1)
+
+    def getCaseNum2RowInExcel(self):
+        """
+        Get the row number corresponding to each test case ID in Excel,
+        so test results can be filled in conveniently.
+        """
+        import xlrd
+        book = xlrd.open_workbook(r"h:\tcs-api.xlsx")
+        sheet = book.sheet_by_index(0)
+        caseNumbers = sheet.col_values(colx=1)
+        print(caseNumbers)
+
+        for row, cn in enumerate(caseNumbers):
+            if '-' in cn:
+                self.caseNum2Row[cn] = row + 1
+
+        print(self.caseNum2Row)
+
+    def case_result(self, case):
+        """
+        case_result is the function called after each test case finishes executing.
+
+        @param case: test case class instance
+        """
+        
+        # Find the row number of the corresponding test case in Excel.
+        caseNo = case.name.split(' - ')[-1].strip()
+        cell = self.sheet.Cells(self.caseNum2Row[caseNo], self.TEST_RET_COL_NO)
+        # Scroll the window to ensure the current test result cell is visible.
+        self.excel.ActiveWindow.ScrollRow = self.caseNum2Row[caseNo]-2
+
+        if case.execRet == 'pass':
+            cell.Value = 'pass'
+            cell.Font.Color =  0xBF00 # Set to green
+        else:
+            cell.Font.Color =  0xFF   # Set to red
+            if case.execRet == 'fail':
+                cell.Value = 'fail'
+            elif case.execRet == 'abort':
+                cell.Value = 'abort'
+
+    def test_end(self, runner):
+        """
+        test_end is the function called after the entire test execution finishes.
+
+        @param runner: hytest runner object
+               runner.case_list: a list containing all test case class instances
+        """
+        for case in runner.case_list:
+            print(f'{case.name} --- {case.execRet}')
+
+# Register an instance of this class as a hytest signal handler object.
+from hytest import signal
+signal.register(MySignalHandler())
+```
